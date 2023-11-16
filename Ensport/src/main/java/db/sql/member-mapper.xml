@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="loginMember">
+		SELECT *
+		FROM MEMBER
+		WHERE USER_ID = ?
+		AND USER_PASSWORD = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+
+	<entry key="insertMember">
+	INSERT INTO MEMBER(
+						USER_NO
+						,USER_ID
+						,USER_PASSWORD
+						,USER_NICKNAME
+						,USER_NAME
+						,EMAIL
+						,PHONE
+						,ENROLLDATE
+						,GENDER
+						,ADDRESS
+						,PREFER
+						,IMAGES
+						,STATUS
+						,ADDRESS_DETAIL
+						)
+						VALUES(
+						SEQ_MNO.NEXTVAL, ?, ?, ?, ?, ?, ?, DEFAULT, ?, ?, ?, null, 'Y', ?)
+	</entry>
+	
+	
+	<entry key="idDuplCheck">
+		SELECT COUNT(*) COUNT
+		FROM MEMBER
+		WHERE USER_ID = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	
+	<entry key="phoneDuplCheck">
+		SELECT COUNT(*) COUNT
+		FROM MEMBER
+		WHERE PHONE = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	
+	<entry key="updateMember">
+	    UPDATE MEMBER SET
+	    USER_NAME = ?
+    , PHONE =?
+    , ADDRESS = ?
+    , ADDRESS_DETAIL =?
+    , EMAIL =?
+    , GENDER = ?
+    , USER_NICKNAME =?
+    , PREFER = ?
+	    WHERE
+	    USER_ID = ?
+	</entry>
+	
+	<entry key="selectMember">
+		SELECT *
+		FROM MEMBER
+		WHERE USER_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	
+	<entry key="updatePwd">
+		UPDATE MEMBER
+		SET
+		USER_PASSWORD = ?
+		WHERE
+		USER_PASSWORD = ?
+		AND USER_NO =?
+		AND STATUS = 'Y'
+	</entry>
+
+	
+	<entry key="deleteMember">
+		UPDATE MEMBER SET
+		STATUS = 'N'
+		WHERE USER_NO = ?
+		AND USER_PASSWORD = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	
+	<entry key="boardListCount">
+		SELECT COUNT(*) AS COUNT
+		FROM BOARD
+		WHERE USER_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	
+	<entry key="selectMyBoardList">
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+              FROM(                            
+                    SELECT
+                     BOARD_NO
+                    , BOARD_TITLE
+                    , BOARD_CONTENT
+                    , CREATE_DATE
+                    , BOARD_COUNT
+                    , STATUS
+                     FROM BOARD
+                     WHERE USER_NO = ?
+                     ORDER BY CREATE_DATE DESC
+                 ) A
+              )
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+</properties>

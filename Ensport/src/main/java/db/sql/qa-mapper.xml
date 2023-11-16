@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<entry key="qaListCount">
+		SELECT COUNT(*) AS COUNT
+		FROM QA
+		WHERE USER_NO = ?
+	</entry>
+
+	<entry key="selectMyQaList">
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+              FROM(                            
+                    SELECT
+                       QA_NO
+                     , QA_TITLE
+                     , QA_CONTENT
+                     , Q.CREATE_DATE AS WRITEDATE
+                     , QA_ANSWER
+                     , QC.CREATE_DATE AS  ANSWERDATE
+                     FROM QA Q LEFT JOIN QA_COMMENT QC
+                     ON(Q.QA_NO = QC.QA_ANSWER_NO)
+                     WHERE Q.USER_NO = ?
+                     ORDER BY Q.CREATE_DATE DESC
+                 ) A
+              )
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+</properties>

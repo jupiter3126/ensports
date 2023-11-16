@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="insertBoard">
+		INSERT INTO BOARD(BOARD_NO,USER_NO,BOARD_TITLE,BOARD_CONTENT,BOARD_TYPE)
+				VALUES(SEQ_BNO.NEXTVAL
+					  ,?
+					  ,?
+					  ,?
+					  ,?)
+	</entry>
+	
+	<entry key="insertAttachment">
+		INSERT INTO ATTACHMENT(AT_NO
+							  ,REF_NO
+							  ,ORIGIN_NAME
+							  ,CHANGE_NAME
+							  ,FILE_PATH
+							  ,FILE_TYPE
+							  ,FILE_LEVEL)
+               VALUES(SEQ_FNO.NEXTVAL
+               		 ,SEQ_BNO.CURRVAL
+               		 ,?
+               		 ,?
+               		 ,?
+               		 ,1
+               		 ,4)
+	</entry>
+	
+	<entry key="increaseCount">
+		UPDATE BOARD 
+		SET BOARD_COUNT = BOARD_COUNT + 1
+		WHERE BOARD_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectBoard">
+		SELECT BOARD_NO
+		      ,USER_NICKNAME
+		      ,BOARD_TITLE
+		      ,BOARD_CONTENT
+		      ,CREATE_DATE
+		      ,BOARD_COUNT
+		      ,BOARD_TYPE
+		FROM BOARD B
+		JOIN MEMBER M USING (USER_NO)
+		WHERE BOARD_NO = ?
+		AND B.STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectAttachment">
+		SELECT AT_NO
+			  ,ORIGIN_NAME
+			  ,CHANGE_NAME
+			  ,FILE_PATH
+    	FROM ATTACHMENT
+		WHERE REF_NO = ?
+		AND FILE_LEVEL = 4 
+	</entry>
+	
+	<entry key="selectBoardList">
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+		     		FROM (SELECT BOARD_NO,
+		                    USER_NICKNAME,
+		                    BOARD_TITLE,
+		                    CREATE_DATE,
+		                    BOARD_COUNT,
+		                    BOARD_TYPE
+		                    FROM BOARD B
+		                    JOIN MEMBER N USING (USER_NO)
+		                    WHERE B.STATUS = 'Y'
+		                    ORDER BY BOARD_TYPE ASC, BOARD_NO DESC) A)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="listCount">
+		SELECT COUNT(*) COUNT
+		FROM BOARD
+		WHERE STATUS = 'Y'
+	</entry>
+	
+	<entry key="updateBoard">
+		 UPDATE BOARD
+		    SET BOARD_TITLE = ?
+			   ,BOARD_CONTENT = ?
+			WHERE BOARD_NO = ?
+			AND STATUS = 'Y'
+	</entry>
+	
+	<entry key="updateAttachment">
+		UPDATE ATTACHMENT
+		   SET ORIGIN_NAME = ?
+		   	  ,CHANGE_NAME = ?
+		   	  ,FILE_PATH = ?
+		   	  ,UPLOAD_DATE = SYSDATE
+		WHERE AT_NO = ?
+		AND FILE_TYPE = 1  	  
+	</entry>
+	
+	<entry key="insertNewAttachment">
+		INSERT INTO ATTACHMENT(AT_NO
+							  ,REF_NO
+							  ,ORIGIN_NAME
+							  ,CHANGE_NAME
+							  ,FILE_PATH
+							  ,FILE_TYPE
+							  ,FILE_LEVEL)
+               VALUES(SEQ_FNO.NEXTVAL
+               		 ,?
+               		 ,?
+               		 ,?
+               		 ,?
+               		 ,1
+               		 ,4)
+               		 
+	</entry>
+	
+	<entry key="deleteBoard">
+		DELETE FROM BOARD
+		WHERE BOARD_NO = ?
+	</entry>
+	
+	<entry key="insertReply">
+		INSERT INTO REPLY(REPLY_NO
+						 ,REPLY_CONTENT
+						 ,BOARD_NO
+						 ,USER_ID)
+		VALUES (SEQ_REPLY.NEXTVAL
+				,?
+				,?
+				,?)
+	</entry>
+	
+	<entry key="selectReplyList">
+		SELECT REPLY_NO,USER_NICKNAME,REPLY_CONTENT,CREATE_DATE
+		FROM REPLY R
+		JOIN MEMBER M USING(USER_ID)
+		WHERE R.STATUS = 'Y'
+		AND BOARD_NO = ?
+		ORDER BY CREATE_DATE DESC
+	</entry>
+	<entry key="deleteReply">
+		DELETE FROM REPLY
+		WHERE REPLY_NO = ?
+	</entry>
+	<entry key="updateReply">
+		UPDATE REPLY
+		SET REPLY_CONTENT = ?
+		WHERE REPLY_NO = ?
+	</entry>
+	
+	<entry key="insertAttachmentList">
+		INSERT INTO ATTACHMENT(AT_NO
+							  ,REF_NO
+							  ,ORIGIN_NAME
+							  ,CHANGE_NAME
+							  ,FILE_PATH
+							  ,FILE_LEVEL
+							  ,FILE_TYPE)
+               VALUES(SEQ_FNO.NEXTVAL
+               		 ,SEQ_BNO.CURRVAL
+               		 ,?
+               		 ,?
+               		 ,?
+               		 ,3
+               		 ,1)
+	</entry>
+	
+	<entry key="selectImageAttachment">
+		SELECT AT_NO
+			  ,ORIGIN_NAME
+			  ,CHANGE_NAME
+			  ,FILE_PATH
+    	FROM ATTACHMENT
+		WHERE REF_NO = ?
+		AND FILE_LEVEL = 3 
+	</entry>
+	
+	<entry key="deleteAttachment">
+		DELETE FROM ATTACHMENT
+		WHERE REF_NO = ?
+	</entry>
+	<entry key="deleteReply">
+		DELETE FROM REPLY
+		WHERE REPLY_NO = ?
+		ORDER BY CREATE_DATE DESC
+	</entry>
+	<entry key="deleteReply">
+		DELETE FROM REPLY
+		WHERE REPLY_NO = ?
+		ORDER BY CREATE_DATE DESC
+	</entry>
+	<entry key="deleteReply">
+		DELETE FROM REPLY
+		WHERE REPLY_NO = ?
+	</entry>
+	<entry key="updateReply">
+		UPDATE REPLY
+		SET REPLY_CONTENT = ?
+		WHERE REPLY_NO = ?
+	</entry>
+	
+</properties>

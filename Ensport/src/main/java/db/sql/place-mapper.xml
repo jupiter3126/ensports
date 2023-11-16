@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="SoccerPlaceList">
+	SELECT PLACE_NO
+			,PLACE_NAME
+			,FILE_PATH
+		    ,CHANGE_NAME
+	FROM PLACE P
+	JOIN ATTACHMENT AT
+	ON(PLACE_NO=REF_NO)
+	WHERE LOCAL_NAME=?
+	AND FILE_LEVEL = 1
+	AND CATEGORY_NO = 1
+	</entry>
+	
+	<entry key="increaseCount">
+	UPDATE PLACE
+	SET PLACE_COUNT = PLACE_COUNT +1 
+	WHERE PLACE_NO = ?	
+	</entry>
+	
+	<entry key="selectAttachment">
+	SELECT AT_NO
+		   ,ORIGIN_NAME
+		   ,CHANGE_NAME
+		   ,FILE_PATH
+	FROM ATTACHMENT
+	WHERE REF_NO= ?
+	AND FILE_TYPE = 2	
+	</entry>
+	
+	<entry key = "selectSoccerPlace">
+	SELECT PLACE_NO
+      	  ,PLACE_NAME
+      	  ,PLACE_SUB_INFO
+          ,PLACE_SIZE
+          ,PARKING_YN
+          ,PLACE_DATE
+          ,PLACE_START_TIME
+          ,PLACE_END_TIME
+          ,MAX_CAPACITY
+          ,CATEGORY_NAME
+	FROM PLACE P
+	LEFT JOIN CATEGORY USING(CATEGORY_NO)
+	WHERE PLACE_NO=?
+	AND CATEGORY_NO = 1
+	</entry>
+	
+	<entry key = "placeReservationDate">
+	SELECT PLACE_NO
+        ,PLACE_NAME
+        ,FILE_PATH
+        ,CHANGE_NAME
+	FROM PLACE P 
+	JOIN ATTACHMENT AT ON(PLACE_NO=REF_NO)
+	JOIN RESERVATION R USING(PLACE_NO)
+	WHERE TIME_NO = ?	
+	</entry>
+	
+	<entry key="selectUpdateSoccerPlaceList">
+		SELECT PLACE_NO
+		      ,PLACE_NAME
+		      ,FILE_PATH
+		      ,CHANGE_NAME
+		FROM (
+		        SELECT PLACE_NO, PLACE_NAME, FILE_PATH, CHANGE_NAME
+		        FROM PLACE P
+		        LEFT JOIN ATTACHMENT AT ON (PLACE_NO = REF_NO)
+		        WHERE FILE_LEVEL = 1
+		        ORDER BY PLACE_NO DESC
+		    )
+		WHERE ROWNUM BETWEEN 1 AND 8
+	</entry>
+	
+	
+	<entry key="soccerPlaceReservation">
+		INSERT INTO PLAYER
+		VALUES(SEQ_PLAYER.NEXTVAL, ?,
+		        (SELECT RESERVATION_NO
+		            FROM RESERVATION
+		            WHERE
+		            TIME_NO = ?
+		            AND PLACE_NO = ?
+		            AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')),
+		            DEFAULT
+		)	
+	</entry>
+	
+	<entry key="selectAllSoccerPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		        FROM (SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE FILE_LEVEL = 1
+			AND CATEGORY_NO = 1
+			AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+
+
+	<entry key = "allSoccerPlaceCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE
+		WHERE CATEGORY_NO = 1 
+		AND CATEGORY_NO = 1
+	</entry>
+
+	
+	<entry key = "reservationPlayer">
+		SELECT COUNT(*)
+		FROM PLAYER P
+		JOIN RESERVATION R USING(RESERVATION_NO)
+		WHERE PLACE_NO=?
+		AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/dd')
+		AND TIME_NO=?
+		AND FIXED_YN='Y'	
+	</entry>
+	
+	<entry key ="soccerPlaceDuplicate">
+		SELECT COUNT(*) COUNT
+		FROM PLAYER 
+		WHERE USER_NO = ?
+		AND RESERVATION_NO IN 
+	                    (SELECT RESERVATION_NO 
+	                     FROM RESERVATION 
+	                     WHERE TIME_NO = ?
+	                     AND PLACE_NO = ?
+	                     AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')
+	                     AND FIXED_YN = 'Y' )
+	</entry>
+	
+	
+	
+	<entry key="soccerTimeChk">
+		SELECT COUNT(*) COUNT
+		FROM PLAYER
+		WHERE PLAYER_NO = (SELECT PLAYER_NO
+							FROM PLAYER JOIN RESERVATION USING(RESERVATION_NO)
+							WHERE PLACE_NO = ?
+							AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')
+							AND TIME_NO = ?
+							AND FIXED_YN = 'Y')
+	</entry>
+	
+	<entry key ="allSeoulListCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE 
+		WHERE LOCAL_NAME = '서울'
+		AND CATEGORY_NO=1
+	</entry>
+	
+	<entry key = "selectAllseoulPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		      FROM (SELECT PLACE_NO
+                           ,PLACE_NAME
+                           ,FILE_PATH
+                           ,CHANGE_NAME
+                    FROM PLACE P
+                    JOIN ATTACHMENT AT
+                    ON(PLACE_NO=REF_NO)
+                    WHERE LOCAL_NAME= ?
+                    AND FILE_LEVEL = 1
+                    AND CATEGORY_NO = 1
+                    AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key = "allGyeonggiListCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE 
+		WHERE LOCAL_NAME = '경기'
+		AND CATEGORY_NO=1
+	</entry>
+	
+	<entry key = "selectAllgyeonggiPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		      FROM (SELECT PLACE_NO
+                           ,PLACE_NAME
+                           ,FILE_PATH
+                           ,CHANGE_NAME
+                    FROM PLACE P
+                    JOIN ATTACHMENT AT
+                    ON(PLACE_NO=REF_NO)
+                    WHERE LOCAL_NAME= ?
+                    AND FILE_LEVEL = 1
+                    AND CATEGORY_NO = 1
+                    AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectUpdateSoccerPlaceList">
+		SELECT PLACE_NO
+		      ,PLACE_NAME
+		      ,FILE_PATH
+		      ,CHANGE_NAME
+		FROM (
+		        SELECT PLACE_NO, PLACE_NAME, FILE_PATH, CHANGE_NAME
+				FROM PLACE P
+				LEFT JOIN ATTACHMENT AT ON (PLACE_NO = REF_NO)
+				WHERE FILE_LEVEL = 1
+				AND CATEGORY_NO = 2
+				ORDER BY PLACE_COUNT DESC
+		    ) 
+		WHERE ROWNUM BETWEEN 1 AND 8
+	</entry>
+	
+	<!-- 야구시설  -->
+	
+	<entry key ="selectAllBaseballPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		        FROM (SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE FILE_LEVEL = 1
+			AND CATEGORY_NO = 2
+			AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key ="allBaseballPlaceCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE
+		WHERE CATEGORY_NO = 2
+	</entry>
+	
+	<entry key="increaseBaseballCount">
+		UPDATE PLACE
+		SET PLACE_COUNT = PLACE_COUNT +1 
+		WHERE PLACE_NO = ?	
+	</entry>
+	
+	<entry key = "selectBaseballPlace">
+		SELECT PLACE_NO
+	      	  ,PLACE_NAME
+	      	  ,PLACE_SUB_INFO
+	          ,PLACE_SIZE
+	          ,PARKING_YN
+	          ,PLACE_DATE
+	          ,PLACE_START_TIME
+	          ,PLACE_END_TIME
+	          ,MAX_CAPACITY
+	          ,CATEGORY_NAME
+		FROM PLACE P
+		LEFT JOIN CATEGORY USING(CATEGORY_NO)
+		WHERE PLACE_NO=?
+		AND CATEGORY_NO = 2
+	</entry>
+	
+	<entry key="selectBaseballAttachmentlist">
+		SELECT AT_NO
+			   ,ORIGIN_NAME
+			   ,CHANGE_NAME
+			   ,FILE_PATH
+		FROM ATTACHMENT
+		WHERE REF_NO= ?
+		AND FILE_TYPE = 2	
+	</entry>
+	
+	<entry key = "baseballreservationPlayer">
+		SELECT COUNT(*)
+		FROM PLAYER P
+		JOIN RESERVATION R USING(RESERVATION_NO)
+		WHERE PLACE_NO=?
+		AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/dd')
+		AND TIME_NO=?
+		AND FIXED_YN='Y'	
+	</entry>
+	
+	<entry key ="baseballPlaceDuplicate">
+		SELECT COUNT(*) COUNT
+		FROM PLAYER 
+		WHERE USER_NO = ?
+		AND RESERVATION_NO IN 
+	                    (SELECT RESERVATION_NO 
+	                     FROM RESERVATION 
+	                     WHERE TIME_NO = ?
+	                     AND PLACE_NO = ?
+	                     AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')
+	                     AND FIXED_YN = 'Y' )
+	</entry>
+	
+	<entry key="baseballPlaceReservation">
+		INSERT INTO PLAYER
+		VALUES(SEQ_PLAYER.NEXTVAL, ?,
+		        (SELECT RESERVATION_NO
+		            FROM RESERVATION
+		            WHERE
+		            TIME_NO = ?
+		            AND PLACE_NO = ?
+		            AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')),
+		            DEFAULT
+		)	
+	</entry>
+	
+	<entry key="baseballTimeChk">
+		SELECT COUNT(*) COUNT
+		FROM PLAYER
+		WHERE PLAYER_NO = (SELECT PLAYER_NO
+							FROM PLAYER JOIN RESERVATION USING(RESERVATION_NO)
+							WHERE PLACE_NO = ?
+							AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')
+							AND TIME_NO = ?
+							AND FIXED_YN = 'Y' )		
+	</entry>
+	
+	<entry key ="baseballSeoulListCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE
+		WHERE CATEGORY_NO = 2
+		AND LOCAL_NAME='서울'
+	</entry>
+	
+	<entry key = "selectBaseballSeoulPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		      FROM (SELECT PLACE_NO
+                           ,PLACE_NAME
+                           ,FILE_PATH
+                           ,CHANGE_NAME
+                    FROM PLACE P
+                    JOIN ATTACHMENT AT
+                    ON(PLACE_NO=REF_NO)
+                    WHERE LOCAL_NAME= ?
+                    AND FILE_LEVEL = 1
+                    AND CATEGORY_NO = 2
+                    AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key = "baceballGyeonggiListCount">
+		SELECT COUNT(*) COUNT
+		FROM PLACE 
+		WHERE LOCAL_NAME = '경기'
+        AND CATEGORY_NO=2
+	</entry>
+	
+	<entry key = "selectBaseballgyeonggiPlaceList">
+		SELECT * 
+		FROM (SELECT ROWNUM RNUM,A.*
+		      FROM (SELECT PLACE_NO
+                           ,PLACE_NAME
+                           ,FILE_PATH
+                           ,CHANGE_NAME
+                    FROM PLACE P
+                    JOIN ATTACHMENT AT
+                    ON(PLACE_NO=REF_NO)
+                    WHERE LOCAL_NAME= ?
+                    AND FILE_LEVEL = 1
+                    AND CATEGORY_NO = 2
+                    AND FILE_TYPE=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+</properties>

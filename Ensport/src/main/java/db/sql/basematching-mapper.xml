@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectBaseballMatchingList">
+		SELECT PLACE_NO
+		,PLACE_NAME
+		,FILE_PATH
+		,CHANGE_NAME
+		FROM PLACE P
+		left JOIN ATTACHMENT AT
+		ON(PLACE_NO=REF_NO)
+		WHERE LOCAL_NAME=?
+		AND CATEGORY_NO=2
+		AND FILE_LEVEL=1
+		
+	</entry>
+
+	<entry key="increaseCount">
+		UPDATE PLACE
+		SET PLACE_COUNT = PLACE_COUNT +1
+		WHERE PLACE_NO = ?
+	</entry>
+
+	<entry key="listCount">
+		SELECT COUNT(*)
+		FROM PLACE
+		WHERE LOCAL_NAME = ?
+	</entry>
+
+	<entry key="selectAttachment">
+		SELECT AT_NO
+		,ORIGIN_NAME
+		,CHANGE_NAME
+		,FILE_PATH
+		FROM ATTACHMENT
+		WHERE REF_NO=?
+		AND FILE_TYPE=2
+	</entry>
+
+	<entry key="selectPlace">
+		SELECT PLACE_NO
+		,PLACE_NAME
+		,PLACE_SUB_INFO
+		,PLACE_SIZE
+		,PARKING_YN
+		,PLACE_DATE
+		,PLACE_START_TIME
+		,PLACE_END_TIME
+		,MAX_CAPACITY
+		,CATEGORY_NAME
+		FROM PLACE P
+		LEFT JOIN CATEGORY USING(CATEGORY_NO)
+		WHERE PLACE_NO=?
+	</entry>
+	<entry key="selectAllBaseballMatchingList">
+		
+		SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			LEFT JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE FILE_LEVEL = 1
+			AND CATEGORY_NO=2
+		
+
+
+
+
+
+
+		
+	</entry>
+	<!-- 메인 조회순 -->
+	<entry key="selectMainSoccerMatchingList">
+		SELECT PLACE_NO
+		      ,PLACE_NAME
+		      ,FILE_PATH
+		      ,CHANGE_NAME
+		FROM (
+				SELECT PLACE_NO, PLACE_NAME, FILE_PATH, CHANGE_NAME
+				FROM PLACE P
+				LEFT JOIN ATTACHMENT AT ON (PLACE_NO = REF_NO)
+				WHERE FILE_LEVEL = 1
+				ORDER BY PLACE_COUNT DESC
+			) 
+		WHERE ROWNUM BETWEEN 1 AND 4
+	</entry>
+	
+	<!-- 예약 -->
+	<entry key="baseballMatchingReservation">
+	INSERT INTO PLAYER
+	VALUES(
+        SEQ_PLAYER.NEXTVAL, ?,
+        (SELECT RESERVATION_NO
+            FROM RESERVATION
+            WHERE
+            TIME_NO = ?
+            AND PLACE_NO = ?
+            AND RESERVATION_DATE = TO_DATE(?,'YY/MM/DD')),
+            DEFAULT
+	)
+	</entry>
+	
+	<!-- 중복확인 -->
+	<entry key="baseballMatchingDuplicate">
+	SELECT COUNT(*) COUNT
+	FROM PLAYER 
+	WHERE USER_NO = ?
+	AND RESERVATION_NO IN 
+                    (SELECT RESERVATION_NO 
+                     FROM RESERVATION 
+                     WHERE TIME_NO = ?
+                     AND PLACE_NO = ?
+                     AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/DD')
+                     AND FIXED_YN = 'Y' )
+	</entry>
+	
+	<!-- 페이징처리 -->
+	<entry key="MatchingAllListCount">
+	SELECT COUNT(*)  COUNT
+	FROM PLACE
+	WHERE CATEGORY_NO=2
+	</entry>
+	
+		<!-- 전체 야구 리스트 페이징 처리 -->
+	<entry key="selectAllBaseballMatchingList">
+		
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+		        FROM (SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE FILE_LEVEL = 1
+			AND FILE_TYPE=2
+			AND CATEGORY_NO=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 서울 페이징처리  -->
+	<entry key="allSeoulListCount">
+	SELECT COUNT(*)  COUNT
+	FROM PLACE
+	WHERE LOCAL_NAME = '서울'
+	AND CATEGORY_NO=2
+	</entry>
+	
+		<!-- 서울 축구 리스트 페이징 처리 -->
+	<entry key="selectAllseoulMatchingList">
+		
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+		        FROM (SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE LOCAL_NAME=?
+			AND FILE_LEVEL = 1
+			AND FILE_TYPE=2
+			AND CATEGORY_NO=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<!-- 경기 페이징처리  -->
+	<entry key="allGyeonggiListCount">
+	SELECT COUNT(*)  COUNT
+	FROM PLACE
+	WHERE LOCAL_NAME = '경기'
+	AND CATEGORY_NO=2
+	</entry>
+	
+		<!-- 경기 축구 리스트 페이징 처리 -->
+	<entry key="selectAllgyeonggiMatchingList">
+		
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+		        FROM (SELECT PLACE_NO
+					,PLACE_NAME
+					,FILE_PATH
+				    ,CHANGE_NAME
+			FROM PLACE P
+			JOIN ATTACHMENT AT
+			ON(PLACE_NO=REF_NO)
+			WHERE LOCAL_NAME=?
+			AND FILE_LEVEL = 1
+			AND FILE_TYPE=2
+			AND CATEGORY_NO=2
+		            )A
+		        )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectReviewList">
+	SELECT R.REVIEW_NO
+      ,R.PLAYER_NO
+      ,R.SCORE
+      ,R.REVIEW_CONTENT
+      ,R.CREATE_DATE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+	</entry>
+	
+	<entry key="selectReviewCount">
+	SELECT COUNT(*)
+	FROM REVIEW
+	</entry>
+	
+	<!-- 리뷰 리스트 -->
+	<entry key="selectReviewList">
+	SELECT R.REVIEW_NO
+      ,M.USER_NICKNAME
+      ,R.SCORE
+      ,R.REVIEW_CONTENT
+      ,R.CREATE_DATE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+	</entry>
+	
+	<!-- 리뷰 카운트 -->
+	<entry key="selectReviewCount">
+	SELECT COUNT(*) COUNT
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+	</entry>
+	
+	<!-- 리뷰 총점 -->
+	<entry key="selectReviewSum">
+	SELECT SUM(SCORE) AS TOTAL
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+	</entry>
+	
+	<!-- 5점 -->
+	<entry key="selectfiveStar">
+	SELECT COUNT(*) FIVE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    AND SCORE=5
+	</entry>
+	
+	<!-- 4점 -->
+	<entry key="selectfourStar">
+	SELECT COUNT(*) FOUR
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    AND SCORE=4
+	</entry>
+	
+		<!-- 3점 -->
+	<entry key="selectthreeStar">
+	SELECT COUNT(*) THREE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    AND SCORE=3
+	</entry>
+	
+		<!-- 4점 -->
+	<entry key="selecttwoStar">
+	SELECT COUNT(*) TWO
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    AND SCORE=2
+	</entry>
+	
+		<!-- 4점 -->
+	<entry key="selectoneStar">
+	SELECT COUNT(*) ONE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    AND SCORE=1
+	</entry>
+	
+	<!-- 리뷰 최신순 -->
+	<entry key="selectRecentReview">
+	SELECT R.REVIEW_NO
+      ,M.USER_NICKNAME
+      ,R.SCORE
+      ,R.REVIEW_CONTENT
+      ,R.CREATE_DATE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    ORDER BY CREATE_DATE DESC
+	</entry>
+	
+	<!-- 리뷰 별점순 -->
+	<entry key="selectStarReview">
+	SELECT R.REVIEW_NO
+      ,M.USER_NICKNAME
+      ,R.SCORE
+      ,R.REVIEW_CONTENT
+      ,R.CREATE_DATE
+	FROM REVIEW R
+	JOIN PLAYER P ON R.PLAYER_NO = P.PLAYER_NO
+	JOIN MEMBER M ON P.USER_NO = M.USER_NO
+	JOIN RESERVATION E ON P.RESERVATION_NO = E.RESERVATION_NO
+	JOIN PLACE L ON E.PLACE_NO = L.PLACE_NO
+	WHERE R.STATUS = 'Y'
+	AND L.PLACE_NO = ?
+    ORDER BY SCORE DESC
+	</entry>
+</properties>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

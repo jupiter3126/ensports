@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<entry key="placeEnroll">
+		INSERT INTO PLACE(PLACE_NO
+						 ,PLACE_NAME
+						 ,PLACE_SIZE
+						 ,PARKING_YN
+						 ,PLACE_DATE
+						 ,PLACE_COUNT
+						 ,PLACE_START_TIME
+						 ,PLACE_END_TIME
+						 ,MAX_CAPACITY
+						 ,CATEGORY_NO
+						 ,LOCAL_NAME
+						 ,PLACE_SUB_INFO)
+		VALUES(SEQ_PNO.NEXTVAL
+			  ,?
+			  ,?
+			  ,? 
+			  ,SYSDATE
+			  ,0
+			  ,DEFAULT
+			  ,DEFAULT
+			  ,?
+			  ,?
+			  ,?
+			  ,?)				 
+		
+	</entry>
+	<entry key="insertPlacePhoto">
+		INSERT INTO ATTACHMENT(AT_NO
+							  ,REF_NO
+							  ,ORIGIN_NAME
+							  ,CHANGE_NAME
+							  ,UPLOAD_DATE
+							  ,FILE_PATH
+							  ,FILE_LEVEL
+							  ,FILE_TYPE)
+		VALUES(SEQ_FNO.NEXTVAL
+			  ,SEQ_PNO.CURRVAL
+			  ,?
+			  ,?
+			  ,SYSDATE
+			  ,?
+			  ,?
+			  ,2)							  
+	</entry>
+	<entry key="selectPlaceList">
+		SELECT PLACE_NO
+			  ,PLACE_NAME
+			  ,PLACE_SUB_INFO
+			  ,PLACE_SIZE
+			  ,PARKING_YN
+			  ,PLACE_DATE
+			  ,PLACE_COUNT
+			  ,PLACE_START_TIME
+			  ,PLACE_END_TIME
+			  ,MAX_CAPACITY
+			  ,CATEGORY_NAME
+			  ,LOCAL_NAME
+		FROM PLACE
+		JOIN CATEGORY USING(CATEGORY_NO)
+	</entry>
+	<entry key="selectOnePlace">
+		SELECT *
+		FROM PLACE
+		WHERE PLACE_NO = ?
+	</entry>
+	<entry key="selectOnePlaceAttachment">
+		SELECT ORIGIN_NAME
+		      ,CHANGE_NAME
+		      ,AT_NO
+		      ,FILE_LEVEL
+		FROM ATTACHMENT
+		WHERE REF_NO = ?
+		AND FILE_TYPE = 2
+	</entry>
+	<entry key="updatePlace">
+		UPDATE PLACE
+		SET PLACE_NAME = ?
+		   ,PLACE_SIZE = ?
+		   ,PARKING_YN = ?
+		   ,MAX_CAPACITY = ?
+		   ,CATEGORY_NO = ?
+		   ,LOCAL_NAME = ?
+		   ,PLACE_SUB_INFO = ?
+		WHERE PLACE_NO = ?
+	</entry>
+	<entry key="updatePlaceAttachment">
+		UPDATE ATTACHMENT
+		SET ORIGIN_NAME = ?
+		   ,CHANGE_NAME = ?
+		   ,UPLOAD_DATE = SYSDATE
+		WHERE AT_NO = ?
+		AND FILE_LEVEL = ?
+		AND FILE_TYPE = 2
+		
+	</entry>
+	<entry key="insertNewPlaceAttachment">
+		INSERT INTO ATTACHMENT
+        VALUES(SEQ_FNO.NEXTVAL
+        	  ,?
+        	  ,?
+        	  ,?
+        	  ,SYSDATE
+        	  ,?
+        	  ,?
+        	  ,2)
+	</entry>
+	<entry key="deleteUnselectedFile">
+		DELETE FROM ATTACHMENT
+		WHERE AT_NO = ?
+	</entry>
+	<entry key="deletePlace">
+		DELETE FROM PLACE
+		WHERE PLACE_NO = ?
+	</entry>
+	<entry key="deletePlaceAttachment">
+		DELETE FROM ATTACHMENT
+		WHERE REF_NO = ?
+		AND FILE_TYPE = 2
+	</entry>
+	<entry key="insertQA">
+		INSERT INTO QA(QA_NO
+					  ,USER_NO
+					  ,QA_TITLE
+					  ,QA_CONTENT
+					  ,CREATE_DATE)
+		VALUES(SEQ_QNO.NEXTVAL
+			  ,?
+			  ,?
+			  ,?
+			  ,SYSDATE)
+	</entry>
+	<entry key="selectQAList">
+		SELECT QA_NO
+			  ,USER_NICKNAME
+			  ,QA_TITLE
+			  ,QA_CONTENT
+			  ,CREATE_DATE
+		FROM QA
+		JOIN MEMBER USING(USER_NO)
+	</entry>
+	<entry key="selectOneQA">
+		SELECT QA_NO
+			  ,USER_NICKNAME
+			  ,QA_TITLE
+			  ,QA_CONTENT
+			  ,CREATE_DATE
+		FROM QA
+		JOIN MEMBER USING(USER_NO)
+		WHERE QA_NO = ?
+	</entry>
+	<entry key="insertQAComment">
+		INSERT INTO QA_COMMENT
+		VALUES(?,?,?,SYSDATE)
+	</entry>
+	<entry key="selectOneQAComment">
+		SELECT QA_ANSWER_NO
+			  ,QA_ANSWER
+			  ,CREATE_DATE
+		FROM QA_COMMENT
+		WHERE QA_ANSWER_NO = ?
+		
+	</entry>
+	<entry key="qaCommentUpdate">
+		UPDATE QA_COMMENT
+		SET QA_ANSWER = ?
+		    ,CREATE_DATE = SYSDATE
+		WHERE QA_ANSWER_NO = ?
+		
+	</entry>
+	<entry key="qaCommentDelete">
+		DELETE FROM QA_COMMENT
+		WHERE QA_ANSWER_NO = ?
+	</entry>
+	<entry key="selectMemberList">
+		SELECT USER_NO
+			  ,USER_NICKNAME
+			  ,USER_ID
+			  ,ENROLLDATE
+		FROM MEMBER
+		WHERE STATUS = 'Y'
+	</entry>
+	<entry key="selectOneMember">
+		SELECT *
+		FROM MEMBER
+		WHERE USER_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+	<entry key="adminDeleteMember">
+		UPDATE MEMBER
+		SET STATUS = 'N'
+		WHERE USER_NO = ?
+	</entry>
+	<entry key="countMember">
+		SELECT COUNT(*)
+		FROM MEMBER
+	</entry>
+	<entry key="countPlace">
+		SELECT COUNT(*)
+		FROM PLACE
+	</entry>
+	<entry key="countReply">
+		select count(*)
+		from qa
+		left join qa_comment on(qa_no=qa_answer_no)
+		where qa_answer is null
+	</entry>
+	<entry key="selectReviewList">
+		select review_no
+		      ,create_date
+		      ,review_content
+		      ,user_nickname
+		from review r
+		left join member m on(player_no=user_no)
+		where r.status = 'Y'
+		order by create_date desc
+	</entry>
+	<entry key="countAdminMember">
+		SELECT COUNT(user_no) AS count
+		FROM player
+		GROUP BY user_no
+	</entry>
+	<entry key="countGender">
+		SELECT GENDER, COUNT(GENDER) AS COUNT
+		FROM MEMBER
+		GROUP BY GENDER
+	</entry>
+	<entry key="calculateMonthlyRevenue">
+		SELECT
+		    EXTRACT(MONTH FROM RESERVATION_DATE) AS MONTH,
+		    COUNT(*) AS RESERVATION_COUNT
+		FROM reservation
+		WHERE EXTRACT(YEAR FROM RESERVATION_DATE) = EXTRACT(YEAR FROM SYSDATE)
+		GROUP BY EXTRACT(YEAR FROM RESERVATION_DATE), EXTRACT(MONTH FROM RESERVATION_DATE)
+		ORDER BY EXTRACT(YEAR FROM RESERVATION_DATE) ASC, EXTRACT(MONTH FROM RESERVATION_DATE) ASC
+	</entry>
+</properties>

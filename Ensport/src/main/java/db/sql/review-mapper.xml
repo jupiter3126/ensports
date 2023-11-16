@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<entry key="reviewListCount">
+		SELECT COUNT(*) COUNT
+        FROM REVIEW
+        JOIN PLAYER USING(PLAYER_NO)
+        WHERE USER_NO = ?
+	</entry>
+	
+	
+	<entry key="selectMyReviewList">
+	<![CDATA[
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+              FROM(   
+              	  SELECT
+                        PLAYER_NO,
+						RESERVATION_NO,
+						RESERVATION_DATE,
+						TIME_VALUE,
+						PLACE_NAME,
+						RESERVATION_TYPE,
+						FIXED_YN,
+                        REVIEW_NO,
+                        SCORE,
+                        REVIEW_CONTENT
+                        
+                        FROM
+
+						(SELECT
+                        PLAYER_NO,
+						RESERVATION_NO,
+						RESERVATION_DATE,
+						TIME_VALUE,
+						PLACE_NAME,
+						RESERVATION_TYPE,
+						FIXED_YN
+						FROM PLAYER JOIN RESERVATION USING(RESERVATION_NO)
+						                    JOIN TIME USING(TIME_NO)
+						                    JOIN PLACE USING(PLACE_NO)
+						WHERE USER_NO = ?
+						AND FIXED_YN = 'Y'
+						ORDER BY 2 DESC)
+						
+                        LEFT JOIN REVIEW USING(PLAYER_NO)
+                        WHERE RESERVATION_DATE < SYSDATE
+                        ORDER BY RESERVATION_DATE DESC
+
+                 ) A
+              )
+        WHERE RNUM BETWEEN ? AND ?
+		
+		]]>
+	</entry>
+	
+	
+	<entry key="selectMyReviewDetail">
+		SELECT *
+		FROM REVIEW
+		WHERE REVIEW_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+
+
+	<entry key="insertMyReview">
+		INSERT INTO REVIEW(REVIEW_NO, SCORE, REVIEW_CONTENT, PLAYER_NO)
+		VALUES( SEQ_REVIEW.NEXTVAL, ?, ?, ?)
+	</entry>
+
+
+	<entry key="selectMyReviewNo">
+		SELECT REVIEW_NO
+		FROM REVIEW
+		WHERE SCORE = ?
+		AND REVIEW_CONTENT = ?
+		AND PLAYER_NO = ?
+	</entry>
+	
+	
+	<entry key="deleteMyReview">
+		DELETE FROM REVIEW
+		WHERE REVIEW_NO = ?
+	</entry>
+	
+	
+	<entry key="updateMyReview">
+		UPDATE REVIEW SET
+		SCORE = ?,
+		REVIEW_CONTENT = ?,
+		CREATE_DATE = SYSDATE
+		WHERE REVIEW_NO = ?
+		AND STATUS = 'Y'
+	</entry>
+
+</properties>

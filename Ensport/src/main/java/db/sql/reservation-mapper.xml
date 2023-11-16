@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<entry key="reservationListCount">
+		SELECT COUNT(*) AS COUNT
+		FROM PLAYER
+		WHERE USER_NO = ?
+		AND FIXED_YN = 'Y'
+	</entry>
+
+	<entry key="selectMyReservationList">
+		SELECT *
+		FROM (SELECT ROWNUM RNUM,A.*
+              FROM(   
+                                       
+						SELECT * FROM
+						(SELECT
+						RESERVATION_NO,
+						RESERVATION_DATE,
+						TIME_VALUE,
+						USERCAPACITY,
+						PLACE_NAME,
+						RESERVATION_TYPE,
+						GENDER_TYPE,
+						FIXED_YN
+						FROM PLAYER JOIN RESERVATION USING(RESERVATION_NO)
+						                    JOIN TIME USING(TIME_NO)
+						                    JOIN PLACE USING(PLACE_NO)
+						WHERE USER_NO = ?
+						AND FIXED_YN = 'Y'
+						ORDER BY 2 DESC) MYREV JOIN
+						(SELECT RESERVATION_NO, COUNT(*) AS CURRENTCOUNT
+						FROM PLAYER
+						WHERE FIXED_YN = 'Y'
+						GROUP BY RESERVATION_NO
+						ORDER BY RESERVATION_NO DESC) TOTAL
+						USING(RESERVATION_NO)
+
+                 ) A
+              )
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+
+	<!-- 참여자 -->
+	<entry key="selectPlayer">
+	SELECT COUNT(*)
+	FROM PLAYER P
+	JOIN RESERVATION R USING(RESERVATION_NO)
+	WHERE PLACE_NO=?
+	AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/dd')
+	AND TIME_NO=?
+	AND FIXED_YN='Y'
+	</entry>
+	
+	
+	<!-- 전체인원 -->
+	<entry key="selectAll">
+	SELECT USERCAPACITY
+		FROM RESERVATION
+		WHERE PLACE_NO= ?
+		AND RESERVATION_DATE = TO_DATE(?, 'YY/MM/dd')
+		AND TIME_NO= ?
+	</entry>
+
+
+
+
+
+
+
+
+
+
+
+	<entry key="reservationCancel">
+		UPDATE PLAYER SET FIXED_YN = 'N'
+		WHERE RESERVATION_NO = ?
+		AND USER_NO = ?
+	</entry>
+	
+	
+</properties>
+
